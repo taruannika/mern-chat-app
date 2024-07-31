@@ -2,16 +2,7 @@ const { body, validationResult } = require("express-validator");
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 
-const isEmailAlreadyUsed = async (email) => {
-  try {
-    const usedEmail = await User.findOne({ email });
-    return usedEmail;
-  } catch (error) {
-    throw new Error("Database query failed");
-  }
-};
-
-const userIsInDB = async (email) => {
+const validateEmail = async (email) => {
   try {
     const userInDB = await User.findOne({ email });
     return userInDB;
@@ -21,7 +12,7 @@ const userIsInDB = async (email) => {
 };
 
 const validatePassword = async (email, password) => {
-  const user = await userIsInDB(email);
+  const user = await validateEmail(email);
   if (!user) {
     return false;
   }
@@ -44,7 +35,7 @@ const validateFields = (fields) => {
         .isEmail()
         .withMessage("Invalid email")
         .custom(async (email) => {
-          const emailExist = await isEmailAlreadyUsed(email);
+          const emailExist = await validateEmail(email);
           if (emailExist) {
             throw new Error("Email is already in use");
           }
@@ -93,7 +84,7 @@ const validateUserInDB = (fields) => {
         .custom(async (email, { req }) => {
           const password = req.body.password;
           if (email && password) {
-            const emailExist = await userIsInDB(email);
+            const emailExist = await validateEmail(email);
             if (!emailExist) {
               throw new Error("User not found");
             }
@@ -110,7 +101,7 @@ const validateUserInDB = (fields) => {
         .custom(async (password, { req }) => {
           const email = req.body.email;
           if (email && password) {
-            const emailExist = await userIsInDB(email);
+            const emailExist = await validateEmail(email);
             if (emailExist) {
               const isPasswordValid = await validatePassword(email, password);
               if (!isPasswordValid) {
