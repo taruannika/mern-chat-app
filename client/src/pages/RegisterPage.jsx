@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 export default function RegisterPage() {
   const {
@@ -33,10 +34,8 @@ export default function RegisterPage() {
       };
 
       const response = await axios.post(`${base_url}/auth/register`, user);
-
       toast.success(response.data.message);
     } catch (error) {
-      console.log(error);
       if (error.response.data.errors) {
         const errorData = error.response.data.errors;
 
@@ -50,6 +49,7 @@ export default function RegisterPage() {
           }
         });
       } else {
+        toast.error(error.message || error);
         console.log(error);
       }
     }
@@ -146,10 +146,19 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <button className="rounded-md bg-blue-500 p-2 text-white font-semibold uppercase">
+          <button className="rounded-md bg-blue-500 p-2 text-white font-semibold uppercase hover:bg-blue-700">
             Register
           </button>
         </form>
+        <p className="mt-5">
+          Already have an account?
+          <Link
+            className="font-semibold ml-1 text-blue-500 hover:underline hover:font-bold"
+            to="/login"
+          >
+            Login
+          </Link>
+        </p>
       </div>
     </div>
   );
