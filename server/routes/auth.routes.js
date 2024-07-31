@@ -1,13 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/auth.controller");
-const validateAuthFields = require("../middleware/middleware");
-const validateFields = require("../middleware/middleware");
+const middleware = require("../middleware/middleware");
 
 router.post(
   "/register",
-  validateFields(["name", "email", "password", "confirmpassword"]),
+  middleware.validateFields(["name", "email", "password", "confirmpassword"]),
   controller.registerUser
+);
+
+router.post(
+  "/login",
+  middleware.validateUserInDB(["email", "password"]),
+  controller.loginUser
 );
 
 module.exports = router;

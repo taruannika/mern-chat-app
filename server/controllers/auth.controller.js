@@ -27,4 +27,19 @@ const registerUser = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser };
+// TODO: Set token, set cookies and send response
+const loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    res.status(200).json({
+      message: "Logged in successfully",
+      success: true,
+      data: { email, password },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { registerUser, loginUser };
