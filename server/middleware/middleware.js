@@ -81,6 +81,9 @@ const validateUserInDB = (fields) => {
         .notEmpty()
         .withMessage("Email is required")
         .bail()
+        .isEmail()
+        .withMessage("Invalid email")
+        .bail()
         .custom(async (email, { req }) => {
           const password = req.body.password;
           if (email && password) {

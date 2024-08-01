@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const {
@@ -11,8 +11,54 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm();
 
+  const navigate = useNavigate();
+
   const onLoginUser = async (data) => {
-    console.log(data);
+    const base_url = import.meta.env.VITE_BACKEND_ORIGIN;
+    try {
+      const user = {
+        email: data.email,
+        password: data.password,
+      };
+
+      const response = await axios({
+        method: "post",
+        url: `${base_url}/auth/login`,
+        data: user,
+        withCredentials: true,
+      });
+
+      toast.success(response.data.message);
+
+      if (response.data.success) {
+        console.log(
+          "Setting data to localstorage, set data to store, set store password to empty string"
+        );
+      }
+
+      navigate("/");
+
+      console.log(response);
+      console.log(data);
+    } catch (error) {
+      if (error.response.data.errors) {
+        const errorData = error.response.data.errors;
+
+        const fieldSet = new Set();
+
+        errorData.forEach(({ path, msg }) => {
+          if (!fieldSet.has(path)) {
+            console.log(`Field: ${path}, Message: ${msg}`);
+            setError(path, { type: "server", message: msg });
+            fieldSet.add(path);
+          }
+        });
+      } else {
+        toast.error(error.message || error);
+        console.log(error);
+      }
+      console.log("Field error");
+    }
   };
 
   return (

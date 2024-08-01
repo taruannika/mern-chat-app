@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {
   const {
@@ -10,6 +10,8 @@ export default function RegisterPage() {
     setError,
     formState: { errors },
   } = useForm();
+
+  const navigate = useNavigate();
 
   const onRegisterUser = async (data) => {
     const base_url = import.meta.env.VITE_BACKEND_ORIGIN;
@@ -34,6 +36,7 @@ export default function RegisterPage() {
       };
 
       const response = await axios.post(`${base_url}/auth/register`, user);
+      navigate("/login");
       toast.success(response.data.message);
     } catch (error) {
       if (error.response.data.errors) {
