@@ -1,5 +1,7 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const config = require("../utils/config");
 
 const registerUser = async (req, res, next) => {
   try {
@@ -27,15 +29,24 @@ const registerUser = async (req, res, next) => {
   }
 };
 
-// TODO: Set token, set cookies and send response
 const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    res.status(200).json({
+    const user = await User.findOne({ email });
+
+    const token = await jwt.sign(
+      { id: user.id, email: user.email },
+      config.JWT_SECRET
+    );
+
+    const cookieOptions = { httpOnly: true, secure: true };
+
+    return res.cookie("token", token, cookieOptions).status(200).json({
       message: "Logged in successfully",
       success: true,
-      data: { email, password },
+      token: token,
+      user: user,
     });
   } catch (error) {
     next(error);
