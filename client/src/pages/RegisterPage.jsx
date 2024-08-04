@@ -2,6 +2,8 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import uploadFile from "../utils/uploadFile";
 
 export default function RegisterPage() {
   const {
@@ -12,6 +14,20 @@ export default function RegisterPage() {
   } = useForm();
 
   const navigate = useNavigate();
+
+  const [profilepic, setProfilepic] = useState("");
+  const [uploadImage, setUploadImage] = useState("");
+
+  const onUploadImage = async (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+
+    const uploadedImage = await uploadFile(file);
+
+    setUploadImage(file);
+    setProfilepic(uploadedImage?.url);
+    console.log(uploadImage);
+  };
 
   const onRegisterUser = async (data) => {
     const base_url = import.meta.env.VITE_BACKEND_ORIGIN;
@@ -33,6 +49,7 @@ export default function RegisterPage() {
         email: data.email,
         password: data.password,
         confirmpassword: data.confirmpassword,
+        profilepic: uploadImage?.url,
       };
 
       const response = await axios.post(`${base_url}/auth/register`, user);
@@ -147,6 +164,28 @@ export default function RegisterPage() {
                 {errors.confirmpassword.message}
               </p>
             )}
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="profilepic">
+              Profile Picture
+              <div className="h-14 bg-blue-200 flex justify-center items-center rounded-md hover:border border-primary cursor-pointer">
+                <p className="text-sm">
+                  {uploadImage ? uploadImage?.name : "Upload profile picture"}
+                </p>
+                {profilepic?.name && (
+                  <button className="text-xl ml-4">X</button>
+                )}
+              </div>
+            </label>
+
+            <input
+              className="hidden"
+              type="file"
+              name="profilepic"
+              id="profilepic"
+              onChange={onUploadImage}
+            />
           </div>
 
           <button className="rounded-md bg-blue-500 p-2 text-white font-semibold uppercase hover:bg-blue-700">

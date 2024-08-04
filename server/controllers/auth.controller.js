@@ -5,7 +5,7 @@ const config = require("../utils/config");
 
 const registerUser = async (req, res, next) => {
   try {
-    const { name, email, password, confirmpassword } = req.body;
+    const { name, email, password, confirmpassword, profilepic } = req.body;
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -14,6 +14,7 @@ const registerUser = async (req, res, next) => {
       name,
       email,
       password: hashedPassword,
+      profilepic: profilepic ? profilepic : "",
     });
 
     const savedUser = await newUser.save();
